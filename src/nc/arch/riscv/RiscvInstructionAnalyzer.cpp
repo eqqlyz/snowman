@@ -62,7 +62,7 @@ class RiscvInstructionAnalyzerImpl {
 
 public:
     RiscvInstructionAnalyzerImpl(const RiscvArchitecture *architecture):
-        capstone_(CS_ARCH_RISCV, CS_MODE_ARM), factory_(architecture)
+        capstone_(CS_ARCH_RISCV, CS_MODE_32), factory_(architecture)
     {}
 
     void createStatements(const RiscvInstruction *instruction, core::ir::Program *program) {

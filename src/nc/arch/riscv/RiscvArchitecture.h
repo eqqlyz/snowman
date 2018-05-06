@@ -24,7 +24,7 @@ public:
      * \param byteOrder Byte order of the main memory.
      */
     explicit
-    RiscvArchitecture(ByteOrder byteOrder);
+    RiscvArchitecture();
 
     virtual ~RiscvArchitecture();
 

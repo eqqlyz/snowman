@@ -17,14 +17,10 @@ namespace nc {
 namespace arch {
 namespace riscv {
 
-RiscvArchitecture::RiscvArchitecture(ByteOrder byteOrder):
-    byteOrder_(byteOrder)
+RiscvArchitecture::RiscvArchitecture():
+    byteOrder_(ByteOrder::LittleEndian)
 {
-    if (byteOrder == ByteOrder::LittleEndian) {
-        setName(QLatin1String("riscv-le"));
-    } else {
-        setName(QLatin1String("riscv-be"));
-    }
+    setName(QLatin1String("riscv32"));
     setBitness(32);
     setMaxInstructionSize(RiscvInstruction::maxSize());
 

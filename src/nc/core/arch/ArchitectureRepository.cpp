@@ -10,6 +10,7 @@
 
 #include <nc/arch/x86/X86Architecture.h>
 #include <nc/arch/arm/ArmArchitecture.h>
+#include <nc/arch/riscv/RiscvArchitecture.h>
 
 #include "Architecture.h"
 
@@ -20,6 +21,7 @@ namespace {
 ArchitectureRepository *createInstance() {
     using nc::arch::arm::ArmArchitecture;
     using nc::arch::x86::X86Architecture;
+    using nc::arch::riscv::RiscvArchitecture;
 
     static ArchitectureRepository result;
     result.registerArchitecture(std::make_unique<ArmArchitecture>(ByteOrder::LittleEndian));
@@ -27,6 +29,7 @@ ArchitectureRepository *createInstance() {
     result.registerArchitecture(std::make_unique<X86Architecture>(X86Architecture::REAL_MODE));
     result.registerArchitecture(std::make_unique<X86Architecture>(X86Architecture::PROTECTED_MODE));
     result.registerArchitecture(std::make_unique<X86Architecture>(X86Architecture::LONG_MODE));
+    result.registerArchitecture(std::make_unique<RiscvArchitecture>());
     return &result;
 }
 

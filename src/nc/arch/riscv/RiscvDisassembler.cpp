@@ -15,12 +15,7 @@ namespace riscv {
 RiscvDisassembler::RiscvDisassembler(const RiscvArchitecture *architecture):
     core::arch::Disassembler(architecture)
 {
-    mode_ = CS_MODE_ARM;
-    if (architecture->byteOrder() == ByteOrder::LittleEndian) {
-        mode_ |= CS_MODE_LITTLE_ENDIAN;
-    } else if (architecture->byteOrder() == ByteOrder::BigEndian) {
-        mode_ |= CS_MODE_BIG_ENDIAN;
-    }
+    mode_ = CS_MODE_32;
     capstone_ = std::make_unique<core::arch::Capstone>(CS_ARCH_RISCV, mode_);
 }
 
