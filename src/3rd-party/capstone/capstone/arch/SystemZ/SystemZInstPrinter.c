@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../myinttypes.h"
+#include <platform.h>
 
 #include "SystemZInstPrinter.h"
 #include "../../MCInst.h"
@@ -302,7 +302,7 @@ static void printPCRelOperand(MCInst *MI, int OpNum, SStream *O)
 				SStream_concat(O, "%u", imm);
 		} else {
 			if (imm < -HEX_THRESHOLD)
-				SStream_concat(O, "-0x%x", -imm);
+				SStream_concat(O, "-0x%x", (unsigned int)-imm);
 			else
 				SStream_concat(O, "-%u", -imm);
 		}
@@ -364,7 +364,7 @@ static void printBDLAddrOperand(MCInst *MI, int OpNum, SStream *O)
 
 static void printCond4Operand(MCInst *MI, int OpNum, SStream *O)
 {
-	static char *const CondNames[] = {
+	static const char *const CondNames[] = {
 		"o", "h", "nle", "l", "nhe", "lh", "ne",
 		"e", "nlh", "he", "nl", "le", "nh", "no"
 	};

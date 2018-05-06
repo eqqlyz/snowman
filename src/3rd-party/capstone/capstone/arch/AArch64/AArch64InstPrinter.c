@@ -16,7 +16,7 @@
 
 #ifdef CAPSTONE_HAS_ARM64
 
-#include "../../myinttypes.h"
+#include <platform.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -38,7 +38,7 @@
 #include "AArch64GenInstrInfo.inc"
 
 
-static char *getRegisterName(unsigned RegNo, int AltIdx);
+static const char *getRegisterName(unsigned RegNo, int AltIdx);
 static void printOperand(MCInst *MI, unsigned OpNo, SStream *O);
 static bool printSysAlias(MCInst *MI, SStream *O);
 static char *printAliasInstr(MCInst *MI, SStream *OS, void *info);
@@ -86,7 +86,7 @@ void AArch64_printInst(MCInst *MI, SStream *O, void *Info)
 		bool Is64Bit = (Opcode == AArch64_SBFMXri || Opcode == AArch64_UBFMXri);
 
 		if (MCOperand_isImm(Op2) && MCOperand_getImm(Op2) == 0 && MCOperand_isImm(Op3)) {
-			char *AsmMnemonic = NULL;
+			const char *AsmMnemonic = NULL;
 
 			switch (MCOperand_getImm(Op3)) {
 				default:
@@ -134,7 +134,7 @@ void AArch64_printInst(MCInst *MI, SStream *O, void *Info)
 		// instruction. In all cases the immediate shift amount shift must be in
 		// the range 0 to (reg.size -1).
 		if (MCOperand_isImm(Op2) && MCOperand_isImm(Op3)) {
-			char *AsmMnemonic = NULL;
+			const char *AsmMnemonic = NULL;
 			int shift = 0;
 			int immr = (int)MCOperand_getImm(Op2);
 			int imms = (int)MCOperand_getImm(Op3);
@@ -207,7 +207,7 @@ void AArch64_printInst(MCInst *MI, SStream *O, void *Info)
 				MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = (Is64Bit ? 64 : 32) - (int)MCOperand_getImm(Op2);
 				MI->flat_insn->detail->arm64.op_count++;
 				MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].type = ARM64_OP_IMM;
-				MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = (int)MCOperand_getImm(Op3) + 1;
+				MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = MCOperand_getImm(Op3) + 1;
 				MI->flat_insn->detail->arm64.op_count++;
 			}
 
@@ -232,10 +232,10 @@ void AArch64_printInst(MCInst *MI, SStream *O, void *Info)
 			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].reg = MCOperand_getReg(Op1);
 			MI->flat_insn->detail->arm64.op_count++;
 			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].type = ARM64_OP_IMM;
-			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = (int)MCOperand_getImm(Op2);
+			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = MCOperand_getImm(Op2);
 			MI->flat_insn->detail->arm64.op_count++;
 			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].type = ARM64_OP_IMM;
-			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = (int)MCOperand_getImm(Op3) - (int)MCOperand_getImm(Op2) + 1;
+			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = MCOperand_getImm(Op3) - MCOperand_getImm(Op2) + 1;
 			MI->flat_insn->detail->arm64.op_count++;
 		}
 
@@ -323,7 +323,7 @@ static bool printSysAlias(MCInst *MI, SStream *O)
 	// unsigned Opcode = MCInst_getOpcode(MI);
 	//assert(Opcode == AArch64_SYSxt && "Invalid opcode for SYS alias!");
 
-	char *Asm = NULL;
+	const char *Asm = NULL;
 	MCOperand *Op1 = MCInst_getOperand(MI, 0);
 	MCOperand *Cn = MCInst_getOperand(MI, 1);
 	MCOperand *Cm = MCInst_getOperand(MI, 2);
@@ -631,7 +631,7 @@ static void printHexImm(MCInst *MI, unsigned OpNo, SStream *O)
 	SStream_concat(O, "#%#llx", MCOperand_getImm(Op));
 	if (MI->csh->detail) {
 		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].type = ARM64_OP_IMM;
-		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = (int)MCOperand_getImm(Op);
+		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = MCOperand_getImm(Op);
 		MI->flat_insn->detail->arm64.op_count++;
 	}
 }
@@ -687,7 +687,7 @@ static void printSysCROperand(MCInst *MI, unsigned OpNo, SStream *O)
 	SStream_concat(O, "c%u", MCOperand_getImm(Op));
 	if (MI->csh->detail) {
 		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].type = ARM64_OP_CIMM;
-		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = (int)MCOperand_getImm(Op);
+		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = MCOperand_getImm(Op);
 		MI->flat_insn->detail->arm64.op_count++;
 	}
 }
@@ -715,14 +715,14 @@ static void printAddSubImm(MCInst *MI, unsigned OpNum, SStream *O)
 
 static void printLogicalImm32(MCInst *MI, unsigned OpNum, SStream *O)
 {
-	int64_t Val = (int)MCOperand_getImm(MCInst_getOperand(MI, OpNum));
+	int64_t Val = MCOperand_getImm(MCInst_getOperand(MI, OpNum));
 
 	Val = AArch64_AM_decodeLogicalImmediate(Val, 32);
 	printUInt32Bang(O, (int)Val);
 
 	if (MI->csh->detail) {
 		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].type = ARM64_OP_IMM;
-		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = (int)Val;
+		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = Val;
 		MI->flat_insn->detail->arm64.op_count++;
 	}
 }
@@ -750,7 +750,7 @@ static void printLogicalImm64(MCInst *MI, unsigned OpNum, SStream *O)
 
 	if (MI->csh->detail) {
 		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].type = ARM64_OP_IMM;
-		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = (int)Val;
+		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = Val;
 		MI->flat_insn->detail->arm64.op_count++;
 	}
 }
@@ -838,28 +838,28 @@ static void printArithExtend(MCInst *MI, unsigned OpNum, SStream *O)
 		switch(ExtType) {
 			default:	// never reach
 			case AArch64_AM_UXTB:
-				ext = ARM64_EXT_UXTW;
+				ext = ARM64_EXT_UXTB;
 				break;
 			case AArch64_AM_UXTH:
-				ext = ARM64_EXT_UXTW;
+				ext = ARM64_EXT_UXTH;
 				break;
 			case AArch64_AM_UXTW:
 				ext = ARM64_EXT_UXTW;
 				break;
 			case AArch64_AM_UXTX:
-				ext = ARM64_EXT_UXTW;
+				ext = ARM64_EXT_UXTX;
 				break;
 			case AArch64_AM_SXTB:
-				ext = ARM64_EXT_UXTW;
+				ext = ARM64_EXT_SXTB;
 				break;
 			case AArch64_AM_SXTH:
-				ext = ARM64_EXT_UXTW;
+				ext = ARM64_EXT_SXTH;
 				break;
 			case AArch64_AM_SXTW:
-				ext = ARM64_EXT_UXTW;
+				ext = ARM64_EXT_SXTW;
 				break;
 			case AArch64_AM_SXTX:
-				ext = ARM64_EXT_UXTW;
+				ext = ARM64_EXT_SXTX;
 				break;
 		}
 
@@ -974,10 +974,10 @@ static void printImmScale(MCInst *MI, unsigned OpNum, SStream *O, int Scale)
 
 	if (MI->csh->detail) {
 		if (MI->csh->doing_mem) {
-			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].mem.disp = (int)val;
+			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].mem.disp = (int32_t)val;
 		} else {
 			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].type = ARM64_OP_IMM;
-			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = (int)val;
+			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = val;
 			MI->flat_insn->detail->arm64.op_count++;
 		}
 	}
@@ -992,10 +992,10 @@ static void printUImm12Offset(MCInst *MI, unsigned OpNum, unsigned Scale, SStrea
 		printInt64Bang(O, val);
 		if (MI->csh->detail) {
 			if (MI->csh->doing_mem) {
-				MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].mem.disp = (int)val;
+				MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].mem.disp = (int32_t)val;
 			} else {
 			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].type = ARM64_OP_IMM;
-			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = (int)val;
+			MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = val;
 			MI->flat_insn->detail->arm64.op_count++;
 			}
 		}
@@ -1011,7 +1011,7 @@ static void printPrefetchOp(MCInst *MI, unsigned OpNum, SStream *O)
 {
 	unsigned prfop = (unsigned)MCOperand_getImm(MCInst_getOperand(MI, OpNum));
 	bool Valid;
-	char *Name = A64NamedImmMapper_toString(&A64PRFM_PRFMMapper, prfop, &Valid);
+	const char *Name = A64NamedImmMapper_toString(&A64PRFM_PRFMMapper, prfop, &Valid);
 
 	if (Valid) {
 		SStream_concat0(O, Name);
@@ -1037,7 +1037,12 @@ static void printFPImmOperand(MCInst *MI, unsigned OpNum, SStream *O)
 	double FPImm = MCOperand_isFPImm(MO) ? MCOperand_getFPImm(MO) : AArch64_AM_getFPImmFloat((int)MCOperand_getImm(MO));
 
 	// 8 decimal places are enough to perfectly represent permitted floats.
+#if defined(_KERNEL_MODE)
+	// Issue #681: Windows kernel does not support formatting float point
+	SStream_concat(O, "#<float_point_unsupported>");
+#else
 	SStream_concat(O, "#%.8f", FPImm);
+#endif
 	if (MI->csh->detail) {
 		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].type = ARM64_OP_FP;
 		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].fp = FPImm;
@@ -1121,7 +1126,7 @@ static void printVectorList(MCInst *MI, unsigned OpNum, SStream *O, char *Layout
 	// If it's a D-reg, we need to promote it to the equivalent Q-reg before
 	// printing (otherwise getRegisterName fails).
 	if (GETREGCLASS_CONTAIN0(AArch64_FPR64RegClassID, Reg)) {
-		MCRegisterClass *FPR128RC = MCRegisterInfo_getRegClass(MRI, AArch64_FPR128RegClassID);
+		const MCRegisterClass *FPR128RC = MCRegisterInfo_getRegClass(MRI, AArch64_FPR128RegClassID);
 		Reg = MCRegisterInfo_getMatchingSuperReg(MRI, Reg, AArch64_dsub, FPR128RC);
 	}
 
@@ -1281,7 +1286,7 @@ static void printBarrierOption(MCInst *MI, unsigned OpNo, SStream *O)
 	unsigned Val = (unsigned)MCOperand_getImm(MCInst_getOperand(MI, OpNo));
 	unsigned Opcode = MCInst_getOpcode(MI);
 	bool Valid;
-	char *Name;
+	const char *Name;
 
 	if (Opcode == AArch64_ISB)
 		Name = A64NamedImmMapper_toString(&A64ISB_ISBMapper, Val, &Valid);
@@ -1345,7 +1350,7 @@ static void printSystemPStateField(MCInst *MI, unsigned OpNo, SStream *O)
 {
 	unsigned Val = (unsigned)MCOperand_getImm(MCInst_getOperand(MI, OpNo));
 	bool Valid;
-	char *Name;
+	const char *Name;
 
 	Name = A64NamedImmMapper_toString(&A64PState_PStateMapper, Val, &Valid);
 	if (Valid) {
@@ -1365,12 +1370,12 @@ static void printSystemPStateField(MCInst *MI, unsigned OpNo, SStream *O)
 
 static void printSIMDType10Operand(MCInst *MI, unsigned OpNo, SStream *O)
 {
-	unsigned RawVal = (unsigned)MCOperand_getImm(MCInst_getOperand(MI, OpNo));
+	uint8_t RawVal = (uint8_t)MCOperand_getImm(MCInst_getOperand(MI, OpNo));
 	uint64_t Val = AArch64_AM_decodeAdvSIMDModImmType10(RawVal);
 	SStream_concat(O, "#%#016llx", Val);
 	if (MI->csh->detail) {
 		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].type = ARM64_OP_IMM;
-		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = (int)Val;
+		MI->flat_insn->detail->arm64.operands[MI->flat_insn->detail->arm64.op_count].imm = Val;
 		MI->flat_insn->detail->arm64.op_count++;
 	}
 }

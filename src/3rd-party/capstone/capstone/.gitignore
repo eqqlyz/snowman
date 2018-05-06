@@ -59,6 +59,13 @@ tests/test_sparc
 tests/test_systemz
 tests/test_xcore
 tests/*.static
+tests/test_basic
+tests/test_customized_mnem
+
+
+# regress binaries
+suite/regress/invalid_read_in_print_operand
+
 
 # vim tmp file
 *.swp
@@ -73,6 +80,7 @@ _*
 packages/freebsd/ports/devel/capstone/distinfo
 
 # VisualStudio
+ProjectUpgradeLog.log
 Debug/
 Release/
 ipch/
@@ -80,6 +88,12 @@ ipch/
 *.opensdf
 *.suo
 *.user
+*.backup
+*.VC.db
+*.VC.opendb
+
+# CMake build directories
+build*/
 
 # Xcode
 xcode/Capstone.xcodeproj/xcuserdata
@@ -89,7 +103,10 @@ xcode/Capstone.xcodeproj/project.xcworkspace/xcuserdata
 test_arm_regression
 test_arm_regression.o
 fuzz_harness
-fuzz_harness.o
+test_iter_benchmark
 
 
 *.s
+.DS_Store
+
+cstool/cstool

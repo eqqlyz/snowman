@@ -8,7 +8,6 @@
 
 # build iOS lib for all iDevices, or only specific device
 function build_iOS {
-	${MAKE} clean
 	IOS_SDK=`xcrun --sdk iphoneos --show-sdk-path`
 	IOS_CC=`xcrun --sdk iphoneos -f clang`
 	IOS_CFLAGS="-Os -Wimplicit -isysroot $IOS_SDK"
@@ -55,8 +54,6 @@ function build_android {
     TOOLCHAIN="$NDK/toolchains/$CROSS$GCCVER/prebuilt/$HOSTOS-$HOSTARCH"
     PLATFORM="$NDK/platforms/$APILEVEL/arch-$TARGARCH"
 
-	${MAKE} clean
-
     CROSS="$TOOLCHAIN/bin/$CROSS" CFLAGS="--sysroot=$PLATFORM" LDFLAGS="--sysroot=$PLATFORM" ${MAKE} $*
 }
 
@@ -65,8 +62,6 @@ function build {
 	if [ $(uname -s) = Darwin ]; then
 		export LIBARCHS="i386 x86_64"
 	fi
-
-	${MAKE} clean
 
 	if [ -n "$CC" ]; then
 		${MAKE} CC="$CC" $*
@@ -169,5 +164,7 @@ case "$TARGET" in
   "ios_armv7" ) build_iOS armv7 $*;;
   "ios_armv7s" ) build_iOS armv7s $*;;
   "ios_arm64" ) build_iOS arm64 $*;;
-  * ) echo "Usage: make.sh [nix32|cross-win32|cross-win64|cygwin-mingw32|cygwin-mingw64|ios|ios_armv7|ios_armv7s|ios_arm64|cross-android arm|cross-android arm64|clang|gcc|install|uninstall]"; exit 1;;
+  "osx-kernel" ) CAPSTONE_USE_SYS_DYN_MEM=yes CAPSTONE_HAS_OSXKERNEL=yes CAPSTONE_ARCHS=x86 CAPSTONE_SHARED=no CAPSTONE_BUILD_CORE_ONLY=yes build $*;;
+  "mac-universal-no" ) MACOS_UNIVERSAL=no ${MAKE} $*;;
+  * ) echo "Usage: make.sh [nix32|cross-win32|cross-win64|cygwin-mingw32|cygwin-mingw64|ios|ios_armv7|ios_armv7s|ios_arm64|cross-android arm|cross-android arm64|clang|gcc|install|uninstall|mac-universal-no]"; exit 1;;
 esac

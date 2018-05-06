@@ -11,7 +11,7 @@
 #include "../../utils.h"
 
 
-uint64_t arch_masks[9] = {
+const uint64_t arch_masks[9] = {
 	0, 0xff,
 	0xffff,
 	0,
@@ -20,7 +20,7 @@ uint64_t arch_masks[9] = {
 	0xffffffffffffffff
 };
 
-static x86_reg sib_base_map[] = {
+static const x86_reg sib_base_map[] = {
 	X86_REG_INVALID,
 #define ENTRY(x) X86_REG_##x,
 	ALL_SIB_BASES
@@ -39,7 +39,7 @@ enum {
 	X86_REG_sib64 = 505
 };
 
-static x86_reg sib_index_map[] = {
+static const x86_reg sib_index_map[] = {
 	X86_REG_INVALID,
 #define ENTRY(x) X86_REG_##x,
 	ALL_EA_BASES
@@ -49,7 +49,7 @@ static x86_reg sib_index_map[] = {
 #undef ENTRY
 };
 
-static x86_reg segment_map[] = {
+static const x86_reg segment_map[] = {
 	X86_REG_INVALID,
 	X86_REG_CS,
 	X86_REG_SS,
@@ -75,7 +75,7 @@ x86_reg x86_map_segment(int r)
 }
 
 #ifndef CAPSTONE_DIET
-static name_map reg_name_maps[] = {
+static const name_map reg_name_maps[] = {
 	{ X86_REG_INVALID, NULL },
 
 	{ X86_REG_AH, "ah" },
@@ -183,14 +183,14 @@ static name_map reg_name_maps[] = {
 	{ X86_REG_R13, "r13" },
 	{ X86_REG_R14, "r14" },
 	{ X86_REG_R15, "r15" },
-	{ X86_REG_ST0, "st0" },
-	{ X86_REG_ST1, "st1" },
-	{ X86_REG_ST2, "st2" },
-	{ X86_REG_ST3, "st3" },
-	{ X86_REG_ST4, "st4" },
-	{ X86_REG_ST5, "st5" },
-	{ X86_REG_ST6, "st6" },
-	{ X86_REG_ST7, "st7" },
+	{ X86_REG_ST0, "st(0" },
+	{ X86_REG_ST1, "st(1)" },
+	{ X86_REG_ST2, "st(2)" },
+	{ X86_REG_ST3, "st(3)" },
+	{ X86_REG_ST4, "st(4)" },
+	{ X86_REG_ST5, "st(5)" },
+	{ X86_REG_ST6, "st(6)" },
+	{ X86_REG_ST7, "st(7)" },
 	{ X86_REG_XMM0, "xmm0" },
 	{ X86_REG_XMM1, "xmm1" },
 	{ X86_REG_XMM2, "xmm2" },
@@ -315,7 +315,7 @@ static name_map reg_name_maps[] = {
 #endif
 
 // register size in non-64bit mode
-uint8_t regsize_map_32 [] = {
+const uint8_t regsize_map_32 [] = {
 	0,	// 	{ X86_REG_INVALID, NULL },
 	1,	// { X86_REG_AH, "ah" },
 	1,	// { X86_REG_AL, "al" },
@@ -553,7 +553,7 @@ uint8_t regsize_map_32 [] = {
 };
 
 // register size in 64bit mode
-uint8_t regsize_map_64 [] = {
+const uint8_t regsize_map_64 [] = {
 	0,	// 	{ X86_REG_INVALID, NULL },
 	1,	// { X86_REG_AH, "ah" },
 	1,	// { X86_REG_AL, "al" },
@@ -812,7 +812,7 @@ const char *X86_reg_name(csh handle, unsigned int reg)
 }
 
 #ifndef CAPSTONE_DIET
-static name_map insn_name_maps[] = {
+static const name_map insn_name_maps[] = {
 	{ X86_INS_INVALID, NULL },
 
 	{ X86_INS_AAA, "aaa" },
@@ -2125,7 +2125,7 @@ const char *X86_insn_name(csh handle, unsigned int id)
 }
 
 #ifndef CAPSTONE_DIET
-static name_map group_name_maps[] = {
+static const name_map group_name_maps[] = {
 	// generic groups
 	{ X86_GRP_INVALID, NULL },
 	{ X86_GRP_JUMP,	"jump" },
@@ -2204,7 +2204,7 @@ const char *X86_group_name(csh handle, unsigned int id)
 #endif
 
 #ifndef CAPSTONE_X86_REDUCE
-static insn_map insns[] = {	// full x86 instructions
+static const insn_map insns[] = {	// full x86 instructions
 	// dummy item
 	{
 		0, 0,
@@ -4040,13 +4040,13 @@ static insn_map insns[] = {	// full x86 instructions
 	{
 		X86_CLC, X86_INS_CLC,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { X86_REG_EFLAGS, 0 }, { 0 }, 0, 0
 #endif
 	},
 	{
 		X86_CLD, X86_INS_CLD,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { X86_REG_EFLAGS, 0 }, { 0 }, 0, 0
 #endif
 	},
 	{
@@ -4076,7 +4076,7 @@ static insn_map insns[] = {	// full x86 instructions
 	{
 		X86_CMC, X86_INS_CMC,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { X86_REG_EFLAGS, 0 }, { 0 }, 0, 0
 #endif
 	},
 	{
@@ -8900,19 +8900,19 @@ static insn_map insns[] = {	// full x86 instructions
 	{
 		X86_LOOP, X86_INS_LOOP,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { 0 }, { 0 }, 1, 0
 #endif
 	},
 	{
 		X86_LOOPE, X86_INS_LOOPE,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { 0 }, { 0 }, 1, 0
 #endif
 	},
 	{
 		X86_LOOPNE, X86_INS_LOOPNE,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { 0 }, { 0 }, 1, 0
 #endif
 	},
 	{
@@ -17036,13 +17036,13 @@ static insn_map insns[] = {	// full x86 instructions
 	{
 		X86_STC, X86_INS_STC,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { X86_REG_EFLAGS, 0 }, { 0 }, 0, 0
 #endif
 	},
 	{
 		X86_STD, X86_INS_STD,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { X86_REG_EFLAGS, 0 }, { 0 }, 0, 0
 #endif
 	},
 	{
@@ -37765,7 +37765,7 @@ static insn_map insns[] = {	// full x86 instructions
 	},
 };
 #else	// X86 reduce (defined CAPSTONE_X86_REDUCE)
-static insn_map insns[] = {	// reduce x86 instructions
+static const insn_map insns[] = {	// reduce x86 instructions
 	// dummy item
 	{
 		0, 0,
@@ -39283,13 +39283,13 @@ static insn_map insns[] = {	// reduce x86 instructions
 	{
 		X86_CLC, X86_INS_CLC,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { X86_REG_EFLAGS, 0 }, { 0 }, 0, 0
 #endif
 	},
 	{
 		X86_CLD, X86_INS_CLD,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { X86_REG_EFLAGS, 0 }, { 0 }, 0, 0
 #endif
 	},
 	{
@@ -39313,7 +39313,7 @@ static insn_map insns[] = {	// reduce x86 instructions
 	{
 		X86_CMC, X86_INS_CMC,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { X86_REG_EFLAGS, 0 }, { 0 }, 0, 0
 #endif
 	},
 	{
@@ -41893,19 +41893,19 @@ static insn_map insns[] = {	// reduce x86 instructions
 	{
 		X86_LOOP, X86_INS_LOOP,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { 0 }, { 0 }, 1, 0
 #endif
 	},
 	{
 		X86_LOOPE, X86_INS_LOOPE,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { 0 }, { 0 }, 1, 0
 #endif
 	},
 	{
 		X86_LOOPNE, X86_INS_LOOPNE,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { 0 }, { 0 }, 1, 0
 #endif
 	},
 	{
@@ -45811,13 +45811,13 @@ static insn_map insns[] = {	// reduce x86 instructions
 	{
 		X86_STC, X86_INS_STC,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { X86_REG_EFLAGS, 0 }, { 0 }, 0, 0
 #endif
 	},
 	{
 		X86_STD, X86_INS_STD,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
+		{ 0 }, { X86_REG_EFLAGS, 0 }, { 0 }, 0, 0
 #endif
 	},
 	{
@@ -47035,6 +47035,21 @@ static insn_map insns[] = {	// reduce x86 instructions
 };
 #endif
 
+#ifndef CAPSTONE_DIET
+// replace r1 = r2
+static void arr_replace(uint8_t *arr, uint8_t max, x86_reg r1, x86_reg r2)
+{
+	uint8_t i;
+
+	for(i = 0; i < max; i++) {
+		if (arr[i] == r1) {
+			arr[i] = r2;
+			break;
+		}
+	}
+}
+#endif
+
 // given internal insn id, return public instruction info
 void X86_get_insn_id(cs_struct *h, cs_insn *insn, unsigned int id)
 {
@@ -47072,6 +47087,109 @@ void X86_get_insn_id(cs_struct *h, cs_insn *insn, unsigned int id)
 						insn->detail->regs_write[1] = X86_REG_ECX;
 						insn->detail->regs_write[2] = X86_REG_EDX;
 						insn->detail->regs_write_count = 3;
+					}
+					break;
+			}
+
+			switch(insn->id) {
+				default:
+					break;
+
+				case X86_INS_LOOP:
+				case X86_INS_LOOPE:
+				case X86_INS_LOOPNE:
+					switch(h->mode) {
+						default: break;
+						case CS_MODE_16:
+								 insn->detail->regs_read[0] = X86_REG_CX;
+								 insn->detail->regs_read_count = 1;
+								 insn->detail->regs_write[0] = X86_REG_CX;
+								 insn->detail->regs_write_count = 1;
+								 break;
+						case CS_MODE_32:
+								 insn->detail->regs_read[0] = X86_REG_ECX;
+								 insn->detail->regs_read_count = 1;
+								 insn->detail->regs_write[0] = X86_REG_ECX;
+								 insn->detail->regs_write_count = 1;
+								 break;
+						case CS_MODE_64:
+								 insn->detail->regs_read[0] = X86_REG_RCX;
+								 insn->detail->regs_read_count = 1;
+								 insn->detail->regs_write[0] = X86_REG_RCX;
+								 insn->detail->regs_write_count = 1;
+								 break;
+					}
+
+					// LOOPE & LOOPNE also read EFLAGS
+					if (insn->id != X86_INS_LOOP) {
+						insn->detail->regs_read[1] = X86_REG_EFLAGS;
+						insn->detail->regs_read_count = 2;
+					}
+
+					break;
+
+				case X86_INS_LODSB:
+				case X86_INS_LODSD:
+				case X86_INS_LODSQ:
+				case X86_INS_LODSW:
+					switch(h->mode) {
+						default:
+							break;
+						case CS_MODE_16:
+							arr_replace(insn->detail->regs_read, insn->detail->regs_read_count, X86_REG_ESI, X86_REG_SI);
+							arr_replace(insn->detail->regs_write, insn->detail->regs_write_count, X86_REG_ESI, X86_REG_SI);
+							break;
+						case CS_MODE_64:
+							arr_replace(insn->detail->regs_read, insn->detail->regs_read_count, X86_REG_ESI, X86_REG_RSI);
+							arr_replace(insn->detail->regs_write, insn->detail->regs_write_count, X86_REG_ESI, X86_REG_RSI);
+							break;
+					}
+					break;
+
+				case X86_INS_SCASB:
+				case X86_INS_SCASW:
+				case X86_INS_SCASQ:
+				case X86_INS_STOSB:
+				case X86_INS_STOSD:
+				case X86_INS_STOSQ:
+				case X86_INS_STOSW:
+					switch(h->mode) {
+						default:
+							break;
+						case CS_MODE_16:
+							arr_replace(insn->detail->regs_read, insn->detail->regs_read_count, X86_REG_EDI, X86_REG_DI);
+							arr_replace(insn->detail->regs_write, insn->detail->regs_write_count, X86_REG_EDI, X86_REG_DI);
+							break;
+						case CS_MODE_64:
+							arr_replace(insn->detail->regs_read, insn->detail->regs_read_count, X86_REG_EDI, X86_REG_RDI);
+							arr_replace(insn->detail->regs_write, insn->detail->regs_write_count, X86_REG_EDI, X86_REG_RDI);
+							break;
+					}
+					break;
+
+				case X86_INS_CMPSB:
+				case X86_INS_CMPSD:
+				case X86_INS_CMPSQ:
+				case X86_INS_CMPSW:
+				case X86_INS_MOVSB:
+				case X86_INS_MOVSW:
+				case X86_INS_MOVSD:
+				case X86_INS_MOVSQ:
+					switch(h->mode) {
+						default:
+							break;
+						case CS_MODE_16:
+							arr_replace(insn->detail->regs_read, insn->detail->regs_read_count, X86_REG_EDI, X86_REG_DI);
+							arr_replace(insn->detail->regs_write, insn->detail->regs_write_count, X86_REG_EDI, X86_REG_DI);
+							arr_replace(insn->detail->regs_read, insn->detail->regs_read_count, X86_REG_ESI, X86_REG_SI);
+							arr_replace(insn->detail->regs_write, insn->detail->regs_write_count, X86_REG_ESI, X86_REG_SI);
+							break;
+						case CS_MODE_64:
+							arr_replace(insn->detail->regs_read, insn->detail->regs_read_count, X86_REG_EDI, X86_REG_RDI);
+							arr_replace(insn->detail->regs_write, insn->detail->regs_write_count, X86_REG_EDI, X86_REG_RDI);
+							arr_replace(insn->detail->regs_read, insn->detail->regs_read_count, X86_REG_ESI, X86_REG_RSI);
+							arr_replace(insn->detail->regs_write, insn->detail->regs_write_count, X86_REG_ESI, X86_REG_RSI);
+							break;
 					}
 					break;
 			}
@@ -47118,68 +47236,15 @@ struct insn_reg2 {
 	x86_reg reg1, reg2;
 };
 
-static struct insn_reg insn_regs_att[] = {
-	{ X86_LODSQ, X86_REG_RAX },
-	{ X86_OR32i32, X86_REG_EAX },
-	{ X86_SUB32i32, X86_REG_EAX },
-	{ X86_TEST32i32, X86_REG_EAX },
-	{ X86_XCHG64ar, X86_REG_RAX },
-	{ X86_LODSB, X86_REG_AL },
-	{ X86_AND32i32, X86_REG_EAX },
-	{ X86_MOV32o32a_16, X86_REG_EAX },
-	{ X86_IN16ri, X86_REG_AX },
-	{ X86_CMP64i32, X86_REG_RAX },
-	{ X86_XOR32i32, X86_REG_EAX },
-	{ X86_XCHG16ar, X86_REG_AX },
-	{ X86_LODSW, X86_REG_AX },
-	{ X86_AND16i16, X86_REG_AX },
-	{ X86_MOV64o64a, X86_REG_RAX },
-	{ X86_ADC16i16, X86_REG_AX },
-	{ X86_XCHG32ar64, X86_REG_EAX },
-	{ X86_ADC8i8, X86_REG_AL },
-	{ X86_MOV64o16a, X86_REG_AX },
-	{ X86_CMP32i32, X86_REG_EAX },
-	{ X86_AND8i8, X86_REG_AL },
-	{ X86_SCASW, X86_REG_AX },
-	{ X86_XOR8i8, X86_REG_AL },
-	{ X86_SUB16i16, X86_REG_AX },
-	{ X86_MOV8o8a, X86_REG_AL },
+static const struct insn_reg insn_regs_att[] = {
+	{ X86_INSB, X86_REG_DX },
+	{ X86_INSW, X86_REG_DX },
+	{ X86_INSL, X86_REG_DX },
+
+	{ X86_MOV16ao16, X86_REG_AX },
+
 	{ X86_MOV32ao32, X86_REG_EAX },
-	{ X86_OR16i16, X86_REG_AX },
-	{ X86_XCHG32ar, X86_REG_EAX },
-	{ X86_SBB8i8, X86_REG_AL },
-	{ X86_SCASQ, X86_REG_RAX },
-	{ X86_SBB32i32, X86_REG_EAX },
-	{ X86_XOR64i32, X86_REG_RAX },
-	{ X86_SUB64i32, X86_REG_RAX },
-	{ X86_ADD64i32, X86_REG_RAX },
-	{ X86_OR8i8, X86_REG_AL },
-	{ X86_TEST64i32, X86_REG_RAX },
-	{ X86_SBB16i16, X86_REG_AX },
-	{ X86_TEST8i8, X86_REG_AL },
-	{ X86_IN8ri, X86_REG_AL },
-	{ X86_TEST16i16, X86_REG_AX },
-	{ X86_SCASL, X86_REG_EAX },
-	{ X86_MOV16o16a_16, X86_REG_AX },
-	{ X86_MOV32o32a, X86_REG_EAX },
-	{ X86_MOV8o8a_16, X86_REG_AL },
-	{ X86_SUB8i8, X86_REG_AL },
-	{ X86_ADD8i8, X86_REG_AL },
-	{ X86_OR64i32, X86_REG_RAX },
-	{ X86_SCASB, X86_REG_AL },
-	{ X86_SBB64i32, X86_REG_RAX },
-	{ X86_ADD16i16, X86_REG_AX },
-	{ X86_XOR16i16, X86_REG_AX },
-	{ X86_MOV64o32a, X86_REG_EAX },
-	{ X86_AND64i32, X86_REG_RAX },
-	{ X86_MOV64o8a, X86_REG_AL },
-	{ X86_MOV16o16a, X86_REG_AX },
-	{ X86_LODSL, X86_REG_EAX },
-	{ X86_CMP8i8, X86_REG_AL },
-	{ X86_ADC64i32, X86_REG_RAX },
-	{ X86_CMP16i16, X86_REG_AX },
-	{ X86_ADC32i32, X86_REG_EAX },
-	{ X86_IN32ri, X86_REG_EAX },
+	{ X86_MOV64o64a, X86_REG_RAX },
 
 	{ X86_PUSHCS32, X86_REG_CS },
 	{ X86_PUSHDS32, X86_REG_DS },
@@ -47213,25 +47278,89 @@ static struct insn_reg insn_regs_att[] = {
 	{ X86_POPGS16, X86_REG_GS },
 	{ X86_POPSS16, X86_REG_SS },
 
+	{ X86_RCL32rCL, X86_REG_CL },
+	{ X86_SHL8rCL, X86_REG_CL },
+	{ X86_SHL16rCL, X86_REG_CL },
+	{ X86_SHL32rCL, X86_REG_CL },
+	{ X86_SHL64rCL, X86_REG_CL },
+	{ X86_SAL8rCL, X86_REG_CL },
+	{ X86_SAL16rCL, X86_REG_CL },
+	{ X86_SAL32rCL, X86_REG_CL },
+	{ X86_SAL64rCL, X86_REG_CL },
+	{ X86_SHR8rCL, X86_REG_CL },
+	{ X86_SHR16rCL, X86_REG_CL },
+	{ X86_SHR32rCL, X86_REG_CL },
+	{ X86_SHR64rCL, X86_REG_CL },
+	{ X86_SAR8rCL, X86_REG_CL },
+	{ X86_SAR16rCL, X86_REG_CL },
+	{ X86_SAR32rCL, X86_REG_CL },
+	{ X86_SAR64rCL, X86_REG_CL },
+	{ X86_RCL8rCL, X86_REG_CL },
+	{ X86_RCL16rCL, X86_REG_CL },
+	{ X86_RCL32rCL, X86_REG_CL },
+	{ X86_RCL64rCL, X86_REG_CL },
+	{ X86_RCR8rCL, X86_REG_CL },
+	{ X86_RCR16rCL, X86_REG_CL },
+	{ X86_RCR32rCL, X86_REG_CL },
+	{ X86_RCR64rCL, X86_REG_CL },
+	{ X86_ROL8rCL, X86_REG_CL },
+	{ X86_ROL16rCL, X86_REG_CL },
+	{ X86_ROL32rCL, X86_REG_CL },
+	{ X86_ROL64rCL, X86_REG_CL },
+	{ X86_ROR8rCL, X86_REG_CL },
+	{ X86_ROR16rCL, X86_REG_CL },
+	{ X86_ROR32rCL, X86_REG_CL },
+	{ X86_ROR64rCL, X86_REG_CL },
+	{ X86_SHLD16rrCL, X86_REG_CL },
+	{ X86_SHRD16rrCL, X86_REG_CL },
+	{ X86_SHLD32rrCL, X86_REG_CL },
+	{ X86_SHRD32rrCL, X86_REG_CL },
+	{ X86_SHLD64rrCL, X86_REG_CL },
+	{ X86_SHRD64rrCL, X86_REG_CL },
+	{ X86_SHLD16mrCL, X86_REG_CL },
+	{ X86_SHRD16mrCL, X86_REG_CL },
+	{ X86_SHLD32mrCL, X86_REG_CL },
+	{ X86_SHRD32mrCL, X86_REG_CL },
+	{ X86_SHLD64mrCL, X86_REG_CL },
+	{ X86_SHRD64mrCL, X86_REG_CL },
+
 	{ X86_OUT8ir, X86_REG_AL },
 	{ X86_OUT16ir, X86_REG_AX },
 	{ X86_OUT32ir, X86_REG_EAX },
 
 #ifndef CAPSTONE_X86_REDUCE
 	{ X86_SKINIT, X86_REG_EAX },
-	{ X86_INVLPGA32, X86_REG_EAX },
 	{ X86_VMRUN32, X86_REG_EAX },
 	{ X86_VMRUN64, X86_REG_RAX },
 	{ X86_VMLOAD32, X86_REG_EAX },
-	{ X86_FNSTSW16r, X86_REG_AX },
-	{ X86_INVLPGA64, X86_REG_RAX },
+	{ X86_VMLOAD64, X86_REG_RAX },
 	{ X86_VMSAVE32, X86_REG_EAX },
 	{ X86_VMSAVE64, X86_REG_RAX },
-	{ X86_VMLOAD64, X86_REG_RAX },
+
+	{ X86_FNSTSW16r, X86_REG_AX },
+
+	{ X86_ADD_FrST0, X86_REG_ST0 },
+	{ X86_SUB_FrST0, X86_REG_ST0 },
+	{ X86_SUBR_FrST0, X86_REG_ST0 },
+	{ X86_MUL_FrST0, X86_REG_ST0 },
+	{ X86_DIV_FrST0, X86_REG_ST0 },
+	{ X86_DIVR_FrST0, X86_REG_ST0 },
 #endif
 };
 
-static struct insn_reg insn_regs_intel[] = {
+static const struct insn_reg insn_regs_intel[] = {
+	{ X86_OUTSB, X86_REG_DX },
+	{ X86_OUTSW, X86_REG_DX },
+	{ X86_OUTSL, X86_REG_DX },
+
+	{ X86_MOV8o8a, X86_REG_AL },   // a02857887c = mov al, byte ptr[0x7c885728]
+	{ X86_MOV32o32a, X86_REG_EAX },
+	{ X86_MOV16o16a, X86_REG_AX },
+	{ X86_MOV64o64a, X86_REG_RAX },
+	{ X86_MOV64o32a, X86_REG_EAX },
+
+	{ X86_MOV64ao32, X86_REG_RAX },   // 64-bit 48 8B04 10203040         // mov     rax, qword ptr [0x40302010]
+
 	{ X86_LODSQ, X86_REG_RAX },
 	{ X86_OR32i32, X86_REG_EAX },
 	{ X86_SUB32i32, X86_REG_EAX },
@@ -47240,24 +47369,20 @@ static struct insn_reg insn_regs_intel[] = {
 	{ X86_XCHG64ar, X86_REG_RAX },
 	{ X86_LODSB, X86_REG_AL },
 	{ X86_AND32i32, X86_REG_EAX },
-	{ X86_MOV32o32a_16, X86_REG_EAX },
 	{ X86_IN16ri, X86_REG_AX },
 	{ X86_CMP64i32, X86_REG_RAX },
 	{ X86_XOR32i32, X86_REG_EAX },
 	{ X86_XCHG16ar, X86_REG_AX },
 	{ X86_LODSW, X86_REG_AX },
 	{ X86_AND16i16, X86_REG_AX },
-	{ X86_MOV64o64a, X86_REG_RAX },
 	{ X86_ADC16i16, X86_REG_AX },
 	{ X86_XCHG32ar64, X86_REG_EAX },
 	{ X86_ADC8i8, X86_REG_AL },
-	{ X86_MOV64o16a, X86_REG_AX },
 	{ X86_CMP32i32, X86_REG_EAX },
 	{ X86_AND8i8, X86_REG_AL },
 	{ X86_SCASW, X86_REG_AX },
 	{ X86_XOR8i8, X86_REG_AL },
 	{ X86_SUB16i16, X86_REG_AX },
-	{ X86_MOV8o8a, X86_REG_AL },
 	{ X86_OR16i16, X86_REG_AX },
 	{ X86_XCHG32ar, X86_REG_EAX },
 	{ X86_SBB8i8, X86_REG_AL },
@@ -47273,9 +47398,6 @@ static struct insn_reg insn_regs_intel[] = {
 	{ X86_IN8ri, X86_REG_AL },
 	{ X86_TEST16i16, X86_REG_AX },
 	{ X86_SCASL, X86_REG_EAX },
-	{ X86_MOV16o16a_16, X86_REG_AX },
-	{ X86_MOV32o32a, X86_REG_EAX },
-	{ X86_MOV8o8a_16, X86_REG_AL },
 	{ X86_SUB8i8, X86_REG_AL },
 	{ X86_ADD8i8, X86_REG_AL },
 	{ X86_OR64i32, X86_REG_RAX },
@@ -47283,10 +47405,7 @@ static struct insn_reg insn_regs_intel[] = {
 	{ X86_SBB64i32, X86_REG_RAX },
 	{ X86_ADD16i16, X86_REG_AX },
 	{ X86_XOR16i16, X86_REG_AX },
-	{ X86_MOV64o32a, X86_REG_EAX },
 	{ X86_AND64i32, X86_REG_RAX },
-	{ X86_MOV64o8a, X86_REG_AL },
-	{ X86_MOV16o16a, X86_REG_AX },
 	{ X86_LODSL, X86_REG_EAX },
 	{ X86_CMP8i8, X86_REG_AL },
 	{ X86_ADC64i32, X86_REG_RAX },
@@ -47328,19 +47447,35 @@ static struct insn_reg insn_regs_intel[] = {
 
 #ifndef CAPSTONE_X86_REDUCE
 	{ X86_SKINIT, X86_REG_EAX },
-	{ X86_INVLPGA32, X86_REG_EAX },
 	{ X86_VMRUN32, X86_REG_EAX },
 	{ X86_VMRUN64, X86_REG_RAX },
 	{ X86_VMLOAD32, X86_REG_EAX },
-	{ X86_FNSTSW16r, X86_REG_AX },
-	{ X86_INVLPGA64, X86_REG_RAX },
+	{ X86_VMLOAD64, X86_REG_RAX },
 	{ X86_VMSAVE32, X86_REG_EAX },
 	{ X86_VMSAVE64, X86_REG_RAX },
-	{ X86_VMLOAD64, X86_REG_RAX },
+
+	{ X86_FNSTSW16r, X86_REG_AX },
+
+	{ X86_CMOVB_F, X86_REG_ST0 },
+	{ X86_CMOVBE_F, X86_REG_ST0 },
+	{ X86_CMOVE_F, X86_REG_ST0 },
+	{ X86_CMOVP_F, X86_REG_ST0 },
+	{ X86_CMOVNB_F, X86_REG_ST0 },
+	{ X86_CMOVNBE_F, X86_REG_ST0 },
+	{ X86_CMOVNE_F, X86_REG_ST0 },
+	{ X86_CMOVNP_F, X86_REG_ST0 },
+	{ X86_ST_FXCHST0r, X86_REG_ST0 },
+	{ X86_ST_FXCHST0r_alt, X86_REG_ST0 },
+	{ X86_ST_FCOMST0r, X86_REG_ST0 },
+	{ X86_ST_FCOMPST0r, X86_REG_ST0 },
+	{ X86_ST_FCOMPST0r_alt, X86_REG_ST0 },
+	{ X86_ST_FPST0r, X86_REG_ST0 },
+	{ X86_ST_FPST0r_alt, X86_REG_ST0 },
+	{ X86_ST_FPNCEST0r, X86_REG_ST0 },
 #endif
 };
 
-static struct insn_reg2 insn_regs_intel2[] = {
+static const struct insn_reg2 insn_regs_intel2[] = {
 	{ X86_IN8rr, X86_REG_AL, X86_REG_DX },
 	{ X86_IN16rr, X86_REG_AX, X86_REG_DX },
 	{ X86_IN32rr, X86_REG_EAX, X86_REG_DX },
@@ -47439,10 +47574,23 @@ static bool valid_repne(cs_struct *h, unsigned int opcode)
 			case X86_INS_MOVSD:
 			case X86_INS_MOVSQ:
 
+			case X86_INS_LODSB:
+			case X86_INS_LODSW:
+			case X86_INS_LODSD:
+			case X86_INS_LODSQ:
+
 			case X86_INS_STOSB:
 			case X86_INS_STOSW:
 			case X86_INS_STOSD:
 			case X86_INS_STOSQ:
+
+			case X86_INS_INSB:
+			case X86_INS_INSW:
+			case X86_INS_INSD:
+
+			case X86_INS_OUTSB:
+			case X86_INS_OUTSW:
+			case X86_INS_OUTSD:
 
 				return true;
 
@@ -47461,6 +47609,53 @@ static bool valid_repne(cs_struct *h, unsigned int opcode)
 	// not found
 	return false;
 }
+
+// given MCInst's id, find out if this insn is valid for BND prefix
+// BND prefix is valid for CALL/JMP/RET
+#ifndef CAPSTONE_DIET
+static bool valid_bnd(cs_struct *h, unsigned int opcode)
+{
+	unsigned int id;
+	int i = insn_find(insns, ARR_SIZE(insns), opcode, &h->insn_cache);
+	if (i != 0) {
+		id = insns[i].mapid;
+		switch(id) {
+			default:
+				return false;
+
+			case X86_INS_JAE:
+			case X86_INS_JA:
+			case X86_INS_JBE:
+			case X86_INS_JB:
+			case X86_INS_JCXZ:
+			case X86_INS_JECXZ:
+			case X86_INS_JE:
+			case X86_INS_JGE:
+			case X86_INS_JG:
+			case X86_INS_JLE:
+			case X86_INS_JL:
+			case X86_INS_JMP:
+			case X86_INS_JNE:
+			case X86_INS_JNO:
+			case X86_INS_JNP:
+			case X86_INS_JNS:
+			case X86_INS_JO:
+			case X86_INS_JP:
+			case X86_INS_JRCXZ:
+			case X86_INS_JS:
+
+			case X86_INS_CALL:
+			case X86_INS_RET:
+			case X86_INS_RETF:
+			case X86_INS_RETFQ:
+				return true;
+		}
+	}
+
+	// not found
+	return false;
+}
+#endif
 
 // given MCInst's id, find out if this insn is valid for REP prefix
 static bool valid_rep(cs_struct *h, unsigned int opcode)
@@ -47554,6 +47749,30 @@ static bool valid_repe(cs_struct *h, unsigned int opcode)
 	// not found
 	return false;
 }
+
+#ifndef CAPSTONE_DIET
+// add *CX register to regs_read[] & regs_write[]
+static void add_cx(MCInst *MI)
+{
+	if (MI->csh->detail) {
+		x86_reg cx;
+
+		if (MI->csh->mode & CS_MODE_16)
+			cx = X86_REG_CX;
+		else if (MI->csh->mode & CS_MODE_32)
+			cx = X86_REG_ECX;
+		else	// 64-bit
+			cx = X86_REG_RCX;
+
+		MI->flat_insn->detail->regs_read[MI->flat_insn->detail->regs_read_count] = cx;
+		MI->flat_insn->detail->regs_read_count++;
+
+		MI->flat_insn->detail->regs_write[MI->flat_insn->detail->regs_write_count] = cx;
+		MI->flat_insn->detail->regs_write_count++;
+	}
+}
+#endif
+
 // return true if we patch the mnemonic
 bool X86_lockrep(MCInst *MI, SStream *O)
 {
@@ -47573,6 +47792,9 @@ bool X86_lockrep(MCInst *MI, SStream *O)
 #ifndef CAPSTONE_DIET	// only care about memonic in standard (non-diet) mode
 			if (valid_repne(MI->csh, opcode)) {
 				SStream_concat(O, "repne|");
+				add_cx(MI);
+			} else if (valid_bnd(MI->csh, opcode)) {
+				SStream_concat(O, "bnd|");
 			} else {
 				// invalid prefix
 				MI->x86_prefix[0] = 0;
@@ -47604,8 +47826,10 @@ bool X86_lockrep(MCInst *MI, SStream *O)
 #ifndef CAPSTONE_DIET	// only care about memonic in standard (non-diet) mode
 			if (valid_rep(MI->csh, opcode)) {
 				SStream_concat(O, "rep|");
+				add_cx(MI);
 			} else if (valid_repe(MI->csh, opcode)) {
 				SStream_concat(O, "repe|");
+				add_cx(MI);
 			} else {
 				// invalid prefix
 				MI->x86_prefix[0] = 0;
@@ -47716,6 +47940,38 @@ void op_addAvxBroadcast(MCInst *MI, x86_avx_bcast v)
 		// link with the previous operand
 		MI->flat_insn->detail->x86.operands[MI->flat_insn->detail->x86.op_count - 1].avx_bcast = v;
 	}
+}
+
+// map immediate size to instruction id
+static struct size_id {
+	unsigned char size;
+	unsigned short id;
+} x86_imm_size[] = {
+#include "X86ImmSize.inc"
+};
+
+// given the instruction name, return the size of its immediate operand (or 0)
+int X86_immediate_size(unsigned int id)
+{
+	// binary searching since the IDs is sorted in order
+	unsigned int left, right, m;
+
+	left = 0;
+	right = ARR_SIZE(x86_imm_size) - 1;
+
+	while(left <= right) {
+		m = (left + right) / 2;
+		if (id == x86_imm_size[m].id)
+			return x86_imm_size[m].size;
+
+		if (id < x86_imm_size[m].id)
+			right = m - 1;
+		else
+			left = m + 1;
+	}
+
+	// not found
+	return 0;
 }
 
 #endif
