@@ -15,6 +15,17 @@ set(SOURCES
     arch/arm/ArmRegisters.h
     arch/arm/CallingConventions.cpp
     arch/arm/CallingConventions.h
+    arch/riscv/RiscvArchitecture.cpp
+    arch/riscv/RiscvArchitecture.h
+    arch/riscv/RiscvDisassembler.cpp
+    arch/riscv/RiscvDisassembler.h
+    arch/riscv/RiscvInstruction.h
+    arch/riscv/RiscvInstructionAnalyzer.cpp
+    arch/riscv/RiscvInstructionAnalyzer.h
+    arch/riscv/RiscvRegisters.cpp
+    arch/riscv/RiscvRegisters.h
+    arch/riscv/CallingConventions.cpp
+    arch/riscv/CallingConventions.h
     arch/x86/CallingConventions.cpp
     arch/x86/CallingConventions.h
     arch/x86/X86Architecture.cpp
