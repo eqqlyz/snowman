@@ -12,7 +12,7 @@ namespace arch {
 namespace riscv {
 
 /**
- * 32-bit ARM Architecture.
+ * 32-bit RISCV Architecture.
  */
 class RiscvArchitecture: public nc::core::arch::Architecture {
     ByteOrder byteOrder_;
